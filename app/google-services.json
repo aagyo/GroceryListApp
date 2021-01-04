@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "24611588814",
+    "firebase_url": "https://grocery-shopping-list-45578-default-rtdb.firebaseio.com",
+    "project_id": "grocery-shopping-list-45578",
+    "storage_bucket": "grocery-shopping-list-45578.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24611588814:android:932efcd4dd32704a45de9f",
+        "android_client_info": {
+          "package_name": "com.example.grocerylistapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "24611588814-r3h0290llfd0fkhkhaqrhp71f9l3ink2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD12KhUvMYjOt4iRKyL6YPjgFXhcNVZKVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "24611588814-r3h0290llfd0fkhkhaqrhp71f9l3ink2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

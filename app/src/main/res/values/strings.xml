@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Grocery List App</string>
+    <string name="lists">lists</string>
+    <string name="inspiration">inspiration</string>
+    <string name="add_item">add_item</string>
+</resources>
