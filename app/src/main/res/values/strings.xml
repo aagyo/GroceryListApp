@@ -3,4 +3,5 @@
     <string name="lists">lists</string>
     <string name="inspiration">inspiration</string>
     <string name="add_item">add_item</string>
+    <string name="update_item">Update Item</string>
 </resources>

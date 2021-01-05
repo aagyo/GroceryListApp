@@ -57,18 +57,19 @@
                         android:minHeight="40dp"
                         android:minWidth="40dp"
                         android:background="@drawable/ic_inspiration"
-                        android:layout_marginRight="50dp"
                         android:layout_marginTop="5dp"
-                        android:layout_marginBottom="1dp"
+                        android:layout_marginRight="50dp"
                         android:id="@+id/navbar_inspbtn"
                         android:layout_marginEnd="50dp" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
                         android:layout_marginEnd="20dp"
                         android:layout_marginRight="20dp"
-                        android:textStyle="bold"
-                        android:text="@string/inspiration" />
+                        android:text="@string/inspiration"
+                        android:textStyle="bold" />
                 </LinearLayout>
                 </RelativeLayout>
     </com.google.android.material.bottomappbar.BottomAppBar>
@@ -81,17 +82,23 @@
         app:maxImageSize="35dp"
         android:id="@+id/navbar_add"/>
 
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="60dp">
-        <androidx.recyclerview.widget.RecyclerView
+        android:layout_height="300dp"
+        android:layout_marginTop="62dp"
+        android:fadeScrollbars="false">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </androidx.recyclerview.widget.RecyclerView>
-    </LinearLayout>
+            android:layout_height="300dp"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/home_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+    </ScrollView>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -6,17 +6,25 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerylistapp.Model.Product;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +41,10 @@ public class HomeActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private String uId;
+
+    private RecyclerView recyclerView;
+    private  FirebaseRecyclerAdapter<Product, MyViewHolder> adapter;
+    private  FirebaseRecyclerOptions<Product> options;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +63,16 @@ public class HomeActivity extends AppCompatActivity {
         uId = mUser.getUid();
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Grocery List").child(uId);
+
+        mDatabase.keepSynced(true);
+
+        recyclerView = findViewById(R.id.home_recycler);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+
+        recyclerView.setLayoutManager(layoutManager);
 
         navBarInspirationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +157,64 @@ public class HomeActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+        dialog.show();
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        options = new FirebaseRecyclerOptions.Builder<Product>().setQuery(mDatabase, Product.class).build();
+
+        adapter = new FirebaseRecyclerAdapter<Product, MyViewHolder>(options) {
+            @NonNull
+            @Override
+            public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
+                return new MyViewHolder(view);
+            }
+            @Override
+            protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull Product model) {
+                holder.setProductName(model.getName());
+                holder.setProductNote(model.getNote());
+                holder.setAmount(String.valueOf(model.getAmount()));
+
+                holder.itemView.findViewById(R.id.more_options).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        PopupMenu popup = new PopupMenu(holder.itemView.getContext(), holder.itemView.findViewById(R.id.more_options));
+                        popup.inflate(R.menu.options_mnu);
+                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                switch (item.getItemId()) {
+                                    case R.id.options_update:
+                                        updateProduct();
+                                        break;
+                                    case R.id.options_delete:
+                                        //handle menu2 click
+                                        break;
+                                }
+                                return false;
+                            }
+                        });
+                        popup.show();
+                    }
+                });
+            }
+        };
+        adapter.startListening();
+        recyclerView.setAdapter(adapter);
+    }
+
+    public void updateProduct(){
+        AlertDialog.Builder myDialog = new AlertDialog.Builder(HomeActivity.this);
+
+        LayoutInflater inflater = LayoutInflater.from(HomeActivity.this);
+
+        View mView = inflater.inflate(R.layout.update_product, null);
+
+        AlertDialog dialog = myDialog.create();
+        dialog.setView(mView);
         dialog.show();
     }
 }
