@@ -46,6 +46,11 @@ public class HomeActivity extends AppCompatActivity {
     private  FirebaseRecyclerAdapter<Product, MyViewHolder> adapter;
     private  FirebaseRecyclerOptions<Product> options;
 
+    private String name;
+    private int amount;
+    private String note;
+    private String postKey;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -188,10 +193,14 @@ public class HomeActivity extends AppCompatActivity {
                             public boolean onMenuItemClick(MenuItem item) {
                                 switch (item.getItemId()) {
                                     case R.id.options_update:
+                                        postKey = getRef(position).getKey();
+                                        name = model.getName();
+                                        amount = model.getAmount();
+                                        note = model.getNote();
                                         updateProduct();
                                         break;
                                     case R.id.options_delete:
-                                        //handle menu2 click
+                                        mDatabase.child(getRef(position).getKey()).removeValue();
                                         break;
                                 }
                                 return false;
@@ -215,6 +224,40 @@ public class HomeActivity extends AppCompatActivity {
 
         AlertDialog dialog = myDialog.create();
         dialog.setView(mView);
+
+        EditText edt_Name = mView.findViewById(R.id.edt_name_upd);
+        EditText edt_Amount = mView.findViewById(R.id.edt_amount_upd);
+        EditText edt_Note = mView.findViewById(R.id.edt_note_upd);
+
+        edt_Name.setText(name);
+        edt_Name.setSelection(name.length());
+
+        edt_Amount.setText(String.valueOf(amount));
+        edt_Amount.setSelection(String.valueOf(amount).length());
+
+        edt_Note.setText(note);
+        edt_Note.setSelection(note.length());
+
+        Button btnUpdate =  mView.findViewById(R.id.update_btn);
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String mName = edt_Name.getText().toString();
+                String mAmount = edt_Amount.getText().toString();
+                String mNote = edt_Note.getText().toString();
+
+                int intAmount = Integer.parseInt(mAmount);
+
+                mDatabase.child(postKey).child("name").setValue(mName);
+                mDatabase.child(postKey).child("amount").setValue(intAmount);
+                mDatabase.child(postKey).child("note").setValue(mNote);
+
+                dialog.dismiss();
+                Toast.makeText(getApplicationContext(), "Item updated successfuly", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         dialog.show();
     }
 }
