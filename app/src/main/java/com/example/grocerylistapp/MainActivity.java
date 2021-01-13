@@ -3,7 +3,9 @@ package com.example.grocerylistapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnLogin;
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 if(TextUtils.isEmpty(mPass)){
-                    email.setError("Required field");
+                    password.setError("Required field");
                     return;
                 }
 
@@ -60,6 +63,15 @@ public class MainActivity extends AppCompatActivity {
                 mAuth.signInWithEmailAndPassword(mEmail,mPass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage("Your email or password is wrong")
+                               .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        alertDialog.dismiss();
+                                    }
+                                });
+                        alertDialog = builder.create();
                         if(task.isSuccessful()) {
                             startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                             Toast.makeText(getApplicationContext(), "Succsessful", Toast.LENGTH_SHORT);
@@ -68,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         else{
                             Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT);
                             mDialog.dismiss();
+                            alertDialog.show();
                         }
                     }
                 });
@@ -79,5 +92,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), RegistrationActivity.class));
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

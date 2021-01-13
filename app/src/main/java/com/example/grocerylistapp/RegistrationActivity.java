@@ -1,6 +1,8 @@
 package com.example.grocerylistapp;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.SignInMethodQueryResult;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -26,6 +29,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private Button btnReg;
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
+    private AlertDialog alertDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,24 +52,48 @@ public class RegistrationActivity extends AppCompatActivity {
                     return;
                 }
                 if(TextUtils.isEmpty(mPass)){
-                    email.setError("Required field");
+                    password.setError("Required field");
+                    return;
+                }
+
+                if(mPass.length() < 6){
+                    password.setError("Password must be at least 6 characters");
                     return;
                 }
 
                 mDialog.setMessage("Processing");
                 mDialog.show();
 
-                mAuth.createUserWithEmailAndPassword(mEmail,mPass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                mAuth.fetchSignInMethodsForEmail(mEmail).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isComplete()){
-                            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-                            Toast.makeText(getApplicationContext(), "Succsessful", Toast.LENGTH_SHORT).show();
+                    public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+                        if (task.getResult().getSignInMethods().size() == 0) {
+                            mAuth.createUserWithEmailAndPassword(mEmail,mPass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(task.isComplete()){
+                                        startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                                        Toast.makeText(getApplicationContext(), "Succsessful", Toast.LENGTH_SHORT).show();
+                                        mDialog.dismiss();
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                        mDialog.dismiss();
+                                    }
+                                }
+                            });
+                        } else {
                             mDialog.dismiss();
-                        }
-                        else{
-                            Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
-                            mDialog.dismiss();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
+                            builder.setMessage("Your email is already registered")
+                                    .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            alertDialog.dismiss();
+                                        }
+                                    });
+                            alertDialog = builder.create();
+                            alertDialog.show();
                         }
                     }
                 });

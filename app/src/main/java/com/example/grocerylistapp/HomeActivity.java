@@ -1,5 +1,9 @@
 package com.example.grocerylistapp;
 
+import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -15,16 +19,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerylistapp.Model.Product;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,8 +50,9 @@ public class HomeActivity extends AppCompatActivity {
     private String uId;
 
     private RecyclerView recyclerView;
-    private  FirebaseRecyclerAdapter<Product, MyViewHolder> adapter;
-    private  FirebaseRecyclerOptions<Product> options;
+    private RecyclerView rusedRecyclerView;
+    private FirebaseRecyclerAdapter<Product, MyViewHolder> adapter;
+    private FirebaseRecyclerOptions<Product> options;
 
     private String name;
     private int amount;
@@ -58,6 +66,7 @@ public class HomeActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Shopping List");
 
         navBarInspirationBtn = (ImageButton) findViewById(R.id.navbar_inspbtn);
         navBarListsBtn = (ImageButton) findViewById(R.id.navbar_listsbtn);
@@ -79,32 +88,43 @@ public class HomeActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(layoutManager);
 
+        rusedRecyclerView = findViewById(R.id.rused_recycler);
+        LinearLayoutManager ruLayoutManager = new LinearLayoutManager(this);
+
+        ruLayoutManager.setStackFromEnd(true);
+        ruLayoutManager.setReverseLayout(true);
+        rusedRecyclerView.setLayoutManager(ruLayoutManager);
+
+        fillData();
+
         navBarInspirationBtn.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "You inspiration", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(getApplicationContext(), InspirationActivity.class));
+                Intent intent = new Intent(getApplicationContext(), InspirationActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
             }
         });
 
-        navBarListsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "You lists", Toast.LENGTH_SHORT).show();
-            }
-        });
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "You add", Toast.LENGTH_SHORT).show();
                 customDialog();
             }
         });
-        //getSupportActionBar().setTitle("Grocery Shopping List");
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu,menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
@@ -112,15 +132,15 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.toolbar_add){
-            Toast.makeText(getApplicationContext(), "You add", Toast.LENGTH_SHORT).show();}
-        else if(id == R.id.toolbar_settings){
-            Toast.makeText(getApplicationContext(), "You settings", Toast.LENGTH_SHORT).show();
+//        if(id == R.id.toolbar_add){
+//            Toast.makeText(getApplicationContext(), "You add", Toast.LENGTH_SHORT).show();}
+        if (id == R.id.toolbar_settings) {
+            onBackPressed();
         }
         return true;
     }
 
-    private void customDialog(){
+    private void customDialog() {
         AlertDialog.Builder mydialog = new AlertDialog.Builder(HomeActivity.this);
 
         LayoutInflater inflater = LayoutInflater.from(HomeActivity.this);
@@ -142,21 +162,23 @@ public class HomeActivity extends AppCompatActivity {
                 String mNote = note.getText().toString();
 
                 int theAmount = 1;
-                if(TextUtils.isEmpty(mName)){
+                if (TextUtils.isEmpty(mName)) {
                     name.setError("RequiredField");
                     return;
                 }
-                if(TextUtils.isEmpty(mAmount)){
-                    theAmount= Integer.parseInt(mAmount);
-                }
-                else{
-                    theAmount= Integer.parseInt(mAmount);
+                if (!TextUtils.isEmpty(mAmount)) {
+                    try {
+                        theAmount = Integer.parseInt(mAmount.trim());
+                    } catch (Exception e) {
+                        amount.setError("This should be a number");
+                        return;
+                    }
                 }
 
                 String id = mDatabase.push().getKey();
                 Product productToSave = new Product(mName, theAmount, mNote, id);
                 assert id != null;
-                mDatabase.child(id).setValue(productToSave);
+                mDatabase.child("ToBuyProducts").child(id).setValue(productToSave);
                 Toast.makeText(getApplicationContext(), "Added a new product", Toast.LENGTH_SHORT).show();
 
                 dialog.dismiss();
@@ -165,10 +187,9 @@ public class HomeActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        options = new FirebaseRecyclerOptions.Builder<Product>().setQuery(mDatabase, Product.class).build();
+    private void fillData() {
+        this.overridePendingTransition(0, 0);
+        options = new FirebaseRecyclerOptions.Builder<Product>().setQuery(mDatabase.child("ToBuyProducts"), Product.class).build();
 
         adapter = new FirebaseRecyclerAdapter<Product, MyViewHolder>(options) {
             @NonNull
@@ -177,12 +198,27 @@ public class HomeActivity extends AppCompatActivity {
                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
                 return new MyViewHolder(view);
             }
+
             @Override
             protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull Product model) {
                 holder.setProductName(model.getName());
                 holder.setProductNote(model.getNote());
                 holder.setAmount(String.valueOf(model.getAmount()));
 
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        name = model.getName();
+                        amount = model.getAmount();
+                        note = model.getNote();
+
+                        String id = mDatabase.push().getKey();
+                        Product productToSave = new Product(name, amount, note, id);
+                        assert id != null;
+                        mDatabase.child("RecentlyUsedProducts").child(id).setValue(productToSave);
+                        mDatabase.child("ToBuyProducts").child(getRef(holder.getAdapterPosition()).getKey()).removeValue();
+                    }
+                });
                 holder.itemView.findViewById(R.id.more_options).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -200,7 +236,7 @@ public class HomeActivity extends AppCompatActivity {
                                         updateProduct();
                                         break;
                                     case R.id.options_delete:
-                                        mDatabase.child(getRef(position).getKey()).removeValue();
+                                        mDatabase.child("ToBuyProducts").child(getRef(holder.getAdapterPosition()).getKey()).removeValue();
                                         break;
                                 }
                                 return false;
@@ -211,11 +247,52 @@ public class HomeActivity extends AppCompatActivity {
                 });
             }
         };
+        FirebaseRecyclerOptions<Product> ruOptions = new FirebaseRecyclerOptions.Builder<Product>().setQuery(mDatabase.child("RecentlyUsedProducts"), Product.class).build();
+
+        FirebaseRecyclerAdapter<Product, MyViewHolder> ruAdapter = new FirebaseRecyclerAdapter<Product, MyViewHolder>(ruOptions) {
+
+            @NonNull
+            @Override
+            public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recentlyused_product, parent, false);
+                return new MyViewHolder(view);
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull Product model) {
+                holder.setProductName(model.getName());
+                holder.setProductNote(model.getNote());
+                holder.setAmount(String.valueOf(model.getAmount()));
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        name = model.getName();
+                        amount = model.getAmount();
+                        note = model.getNote();
+
+                        String id = mDatabase.push().getKey();
+                        Product productToSave = new Product(name, amount, note, id);
+                        assert id != null;
+                        mDatabase.child("ToBuyProducts").child(id).setValue(productToSave);
+                        mDatabase.child("RecentlyUsedProducts").child(getRef(holder.getAdapterPosition()).getKey()).removeValue();
+                    }
+                });
+                holder.itemView.findViewById(R.id.delete_option).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDatabase.child("RecentlyUsedProducts").child(getRef(holder.getAdapterPosition()).getKey()).removeValue();
+                    }
+                });
+            }
+        };
         adapter.startListening();
+        ruAdapter.startListening();
         recyclerView.setAdapter(adapter);
+        rusedRecyclerView.setAdapter(ruAdapter);
     }
 
-    public void updateProduct(){
+    public void updateProduct() {
         AlertDialog.Builder myDialog = new AlertDialog.Builder(HomeActivity.this);
 
         LayoutInflater inflater = LayoutInflater.from(HomeActivity.this);
@@ -238,7 +315,7 @@ public class HomeActivity extends AppCompatActivity {
         edt_Note.setText(note);
         edt_Note.setSelection(note.length());
 
-        Button btnUpdate =  mView.findViewById(R.id.update_btn);
+        Button btnUpdate = mView.findViewById(R.id.update_btn);
 
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,11 +324,17 @@ public class HomeActivity extends AppCompatActivity {
                 String mAmount = edt_Amount.getText().toString();
                 String mNote = edt_Note.getText().toString();
 
-                int intAmount = Integer.parseInt(mAmount);
+                int intAmount;
+                try {
+                    intAmount = Integer.parseInt(mAmount.trim());
+                } catch (Exception e) {
+                    edt_Amount.setError("This should be a number");
+                    return;
+                }
 
-                mDatabase.child(postKey).child("name").setValue(mName);
-                mDatabase.child(postKey).child("amount").setValue(intAmount);
-                mDatabase.child(postKey).child("note").setValue(mNote);
+                mDatabase.child("ToBuyProducts").child(postKey).child("name").setValue(mName);
+                mDatabase.child("ToBuyProducts").child(postKey).child("amount").setValue(intAmount);
+                mDatabase.child("ToBuyProducts").child(postKey).child("note").setValue(mNote);
 
                 dialog.dismiss();
                 Toast.makeText(getApplicationContext(), "Item updated successfuly", Toast.LENGTH_SHORT).show();
@@ -259,5 +342,13 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        mAuth.signOut();
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+        finishAffinity();
     }
 }
