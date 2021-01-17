@@ -18,12 +18,10 @@ import java.util.ArrayList;
 
 public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> {
 
-    private ArrayList<ParseItem> parseItems;
-    private Context context;
+    private final ArrayList<ParseItem> parseItems;
 
     public ParseAdapter(ArrayList<ParseItem> parseItems, Context context) {
         this.parseItems = parseItems;
-        this.context = context;
     }
 
     @NonNull
@@ -60,7 +58,7 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         return parseItems.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder{
 
         ImageView recipeImage;
         TextView title;

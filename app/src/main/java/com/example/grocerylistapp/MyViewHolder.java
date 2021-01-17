@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MyViewHolder extends RecyclerView.ViewHolder{
 
-    private TextView mProductName, mProductNote, mAmount;
+    private final TextView mProductName;
+    private final TextView mProductNote;
+    private final TextView mAmount;
 
     public MyViewHolder(View itemView) {
         super(itemView);

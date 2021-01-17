@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -34,14 +35,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class InspirationActivity extends AppCompatActivity {
-    private Toolbar toolbar;
-    private ImageButton navBarListsBtn;
-    private ImageButton navBarInspirationBtn;
-
     private RecyclerView recyclerView;
     private ParseAdapter parseAdapter;
-    private ArrayList<ParseItem> parseItems = new ArrayList<>();
-    private static Timer timer = new Timer();
+    private final ArrayList<ParseItem> parseItems = new ArrayList<>();
+    private static final Timer timer = new Timer();
     private static AsyncTask<Void, Void, Void> timerTask;
     private ProgressBar progressBar;
 
@@ -53,12 +50,12 @@ public class InspirationActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
 
-        toolbar = findViewById(R.id.home_toolbar);
+        Toolbar toolbar = findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Inspiration");
 
-        navBarInspirationBtn = (ImageButton) findViewById(R.id.navbar_inspbtn);
-        navBarListsBtn = (ImageButton) findViewById(R.id.navbar_listsbtn);
+        ImageButton navBarInspirationBtn = (ImageButton) findViewById(R.id.navbar_inspbtn);
+        ImageButton navBarListsBtn = (ImageButton) findViewById(R.id.navbar_listsbtn);
 
         navBarInspirationBtn.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         navBarListsBtn.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#89000000")));

@@ -3,6 +3,7 @@ package com.example.grocerylistapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -24,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText email;
     private EditText password;
-    private TextView signUp;
-    private Button btnLogin;
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
     private AlertDialog alertDialog;
@@ -37,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
         email = findViewById(R.id.email_login);
         password = findViewById(R.id.password_login);
-        btnLogin = findViewById(R.id.btn_login);
-        signUp = findViewById(R.id.signup_text);
+        Button btnLogin = findViewById(R.id.btn_login);
+        TextView signUp = findViewById(R.id.signup_text);
         mAuth = FirebaseAuth.getInstance();
         mDialog = new ProgressDialog(this);
 
@@ -61,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 mDialog.show();
 
                 mAuth.signInWithEmailAndPassword(mEmail,mPass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @SuppressLint("ShowToast")
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);

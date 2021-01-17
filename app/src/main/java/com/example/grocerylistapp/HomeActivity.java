@@ -1,5 +1,6 @@
 package com.example.grocerylistapp;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -40,18 +41,11 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
-    private ImageButton navBarListsBtn;
-    private ImageButton navBarInspirationBtn;
-    private FloatingActionButton addBtn;
-
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
-    private String uId;
 
     private RecyclerView recyclerView;
     private RecyclerView rusedRecyclerView;
-    private FirebaseRecyclerAdapter<Product, MyViewHolder> adapter;
     private FirebaseRecyclerOptions<Product> options;
 
     private String name;
@@ -64,17 +58,17 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        toolbar = findViewById(R.id.home_toolbar);
+        Toolbar toolbar = findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Shopping List");
 
-        navBarInspirationBtn = (ImageButton) findViewById(R.id.navbar_inspbtn);
-        navBarListsBtn = (ImageButton) findViewById(R.id.navbar_listsbtn);
-        addBtn = findViewById(R.id.navbar_add);
+        ImageButton navBarInspirationBtn = (ImageButton) findViewById(R.id.navbar_inspbtn);
+        ImageButton navBarListsBtn = (ImageButton) findViewById(R.id.navbar_listsbtn);
+        FloatingActionButton addBtn = findViewById(R.id.navbar_add);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser mUser = mAuth.getCurrentUser();
-        uId = mUser.getUid();
+        String uId = mUser.getUid();
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Grocery List").child(uId);
 
@@ -191,7 +185,7 @@ public class HomeActivity extends AppCompatActivity {
         this.overridePendingTransition(0, 0);
         options = new FirebaseRecyclerOptions.Builder<Product>().setQuery(mDatabase.child("ToBuyProducts"), Product.class).build();
 
-        adapter = new FirebaseRecyclerAdapter<Product, MyViewHolder>(options) {
+        FirebaseRecyclerAdapter<Product, MyViewHolder> adapter = new FirebaseRecyclerAdapter<Product, MyViewHolder>(options) {
             @NonNull
             @Override
             public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -225,6 +219,7 @@ public class HomeActivity extends AppCompatActivity {
                         PopupMenu popup = new PopupMenu(holder.itemView.getContext(), holder.itemView.findViewById(R.id.more_options));
                         popup.inflate(R.menu.options_mnu);
                         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @SuppressLint("NonConstantResourceId")
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
                                 switch (item.getItemId()) {

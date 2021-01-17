@@ -34,7 +34,8 @@
         android:text="Title"
         android:textAppearance="?android:textAppearanceLarge"
         android:textColor="@color/white"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_marginStart="20dp" />
     <TableLayout
         android:id="@+id/prep_table"
         android:layout_width="match_parent"

@@ -26,7 +26,6 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText email;
     private EditText password;
     private TextView signIn;
-    private Button btnReg;
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
     private AlertDialog alertDialog;
@@ -37,7 +36,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         email = findViewById(R.id.email_reg);
         password = findViewById(R.id.password_reg);
-        btnReg = findViewById(R.id.btn_reg);
+        Button btnReg = findViewById(R.id.btn_reg);
         mAuth = FirebaseAuth.getInstance();
         mDialog = new ProgressDialog(this);
 

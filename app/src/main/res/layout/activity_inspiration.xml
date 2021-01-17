@@ -21,7 +21,8 @@
         android:layout_marginLeft="165dp"
         android:src="@drawable/chef_hat"
         app:layout_anchor="@+id/navbar"
-        app:layout_anchorGravity="center"/>
+        app:layout_anchorGravity="center"
+        android:layout_marginStart="165dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

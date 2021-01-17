@@ -45,7 +45,8 @@
                 android:maxLines="1"
                 android:padding="5dp"
                 android:text="x100"
-                android:textAppearance="?android:textAppearanceLarge" />
+                android:textAppearance="?android:textAppearanceLarge"
+                android:layout_marginStart="45dp" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -54,7 +55,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="45dp"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:layout_marginStart="10dp">
 
         <TextView
             android:id="@+id/product_note"
@@ -74,6 +76,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:background="@drawable/ic_craion"
-            android:textAppearance="?android:textAppearanceLarge" />
+            android:textAppearance="?android:textAppearanceLarge"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
